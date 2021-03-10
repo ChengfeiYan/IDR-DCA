@@ -1,26 +1,10 @@
 %%R
-options(repr.matrix.max.rows=600, repr.matrix.max.cols=200)
 library(stargazer)
 library(idr)
 library("reader")
-path<-"/home/cfyan/projects/IDR_Coevolution/CoEvo_analysis/CoEvo_monomer/DCA_IDR/"
-setwd(path)
-filename<-"fastalist"
-fasta<-file(filename, open="r")
-fastalins<-readLines(fasta)
-close(fasta)
-fastalins<-gsub(".fasta","",fastalins)
-for (i in 1:length(fastalins))
- {
-   pdb<-fastalins[i] 
-    print(pdb)
-  seq_path<-gsub("DCA_IDR","seq", path)
- fastafile= paste(seq_path,pdb,".fasta",sep="")  
- fasta=n.readLines(fastafile,n=2)
- length=nchar(fasta[1])
- file=paste(path,pdb,"/",pdb,"_contact_prediction_ccmpred.csv",sep="")
- print(file)
- Pred<-read.csv(file,sep="\t")
+length=130                         #The sequence length
+file=paste("1g9oA_contact_prediction_ccmpred.csv",sep="")
+Pred<-read.csv(file,sep="\t")
 Pred_selected<-Pred[Pred$coupling_rank<10*length,]
 coupling_score_f1=Pred_selected$coupling_score_r1
 coupling_score_f2=Pred_selected$coupling_score_r2
@@ -28,10 +12,8 @@ mu <- 1.0
 sigma <-1.0     
 rho <-0.2
 p <- 0.1
-        
 x <- cbind(coupling_score_f1,coupling_score_f2)
-print("sss")
 idr.out <- est.IDR(x, mu, sigma, rho, p, eps=1e-4,max.ite=100)
 Pred_selected["IDR"]<-idr.out$idr
-write.table(Pred_selected,paste(path,pdb,"/",pdb,"_coupling_IDR_ccmpred.csv",sep=""),sep="\t", row.names = FALSE,quote = FALSE)
+write.table(Pred_selected,"1g9oA_coupling_IDR_ccmpred.csv",sep="\t", row.names = FALSE,quote = FALSE)
 }
